@@ -1,0 +1,9 @@
+eclipse.preferences.version=1
+encoding//WebRoot/WEB-INF/pages/admin/attention.jsp=UTF-8
+encoding//WebRoot/WEB-INF/pages/admin/listBooks.jsp=UTF-8
+encoding//WebRoot/WEB-INF/pages/common/error.jsp=UTF-8
+encoding//WebRoot/WEB-INF/pages/common/nullSessionException.jsp=UTF-8
+encoding//WebRoot/WEB-INF/pages/login.jsp=UTF-8
+encoding//WebRoot/WEB-INF/pages/reader/readerList.jsp=UTF-8
+encoding//WebRoot/WEB-INF/pages/reader/toSearchBook.jsp=UTF-8
+encoding//WebRoot/index.jsp=UTF-8

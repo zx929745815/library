@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:context="http://www.springframework.org/schema/context"
+
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+	http://www.springframework.org/schema/mvc
+    http://www.springframework.org/schema/mvc/spring-mvc.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!--可以通过注解进行注入 -->
+	<context:annotation-config></context:annotation-config>
+
+	<!--配置Handler -->
+    <!-- <bean id="handlermapping" class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"></bean> -->
+	<!-- <bean id="handleradapter" class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"></bean> -->
+
+	
+	<mvc:annotation-driven></mvc:annotation-driven>
+	
+	<context:component-scan base-package="xtu"></context:component-scan>
+	
+	<!-- Session失效拦截 -->   
+	<mvc:interceptors>     
+	<!-- 定义拦截器 -->      
+	<mvc:interceptor>           
+	<!-- 匹配的是url路径， 如果不配置或/**,将拦截所有的Controller -->          
+	<mvc:mapping path="/**" />          
+	<!-- 不需要拦截的地址 -->         
+	<mvc:exclude-mapping path="/login/toLogin.do" />  
+	<mvc:exclude-mapping path="/login/logOut.do" />  
+	<mvc:exclude-mapping path="/login/checkLogin.do" />  
+	<mvc:exclude-mapping path="/register/toRegister.do" /> 
+	<bean class="xtu.library.web.interceptor.SystemSessionInterceptor"></bean>       
+	</mvc:interceptor>   
+	</mvc:interceptors> 
+	
+	<!--定义异常处理  -->
+	<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+    <!--    定义默认的异常处理页面，当该异常类型的注册时使用   -->
+    <property name="defaultErrorView" value="error"></property>  
+    <!-- 定义异常处理页面用来获取异常信息的变量名，默认名为exception  --> 
+    <property name="exceptionAttribute" value="ex"></property>  
+   <!--  定义需要特殊处理的异常，用类名或完全路径名作为key，异常也页名作为值   -->
+    <property name="exceptionMappings">  
+        <props>  
+            <prop key="xtu.library.web.exception.NullSessionException">common/nullSessionException</prop>  
+        </props>  
+    </property>  
+	</bean>  
+       
+	<!--配置viewresolver -->
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/pages/"></property>
+		<property name="suffix" value=".jsp"></property>
+	</bean>
+
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+		<property name="driverClass" value="com.mysql.jdbc.Driver" />
+		<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/library" />
+		<property name="user" value="root" />
+		<property name="password" value="12345" />
+		<!--连接池中保留的最大连接数。默认值: 15 -->   
+        <property name="maxPoolSize" value="20"/>  
+        <!-- 连接池中保留的最小连接数，默认为：3-->  
+        <property name="minPoolSize" value="5"/>  
+        <!-- 初始化连接池中的连接数，取值应在minPoolSize与maxPoolSize之间，默认为3-->  
+        <property name="initialPoolSize" value="10"/>  
+	</bean> 
+
+
+	<!--配置sessionFactory -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean" destroy-method="destroy">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="configLocation">
+			<value>
+				classpath:hibernate.cfg.xml
+			</value>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<!--配置hibernate连接参数 -->
+				<!-- MySQL的方言 -->
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<!-- 必要时在数据库新建所有表格 -->
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<!-- 配置current session的上下文环境，方便我们调用sessionFactory获取当前线程统一个session对象 -->
+				<prop key="current_session_context_class">thread</prop>
+				<!-- 用更漂亮的格式显示sql语句 -->
+				<prop key="hibernate.format_sql">true</prop>
+			</props>
+		</property>
+		<!-- 配置需要扫描的包路径，在该包下，所有的类注解配置都会被扫描 -->
+		<property name="packagesToScan" value="xtu" />
+	</bean>
+	
+	 <!--对文件上传进行配置  -->
+	 <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+	 	 <property name="uploadTempDir" value="/tmp" />  <!-- 临时目录 -->
+         <property name="maxUploadSize" value="10485760"/> <!-- 10M -->
+	 </bean>
+</beans>
