@@ -36,22 +36,30 @@
 	
 <script type="text/javascript" src="<%=basePath%>static/js/confirm.js"></script>
 	
+	<style type="text/css">
+	.table > tr > td {
+       vertical-align: middle;
+        }
+	
+	</style>
+	
 </head>
 
 <body>
 	<div>
 		<fieldset>
 			<legend>书籍列表</legend>
-			<table id="bookList" class="display cell-border"
+			<table id="bookList" class="display cell-border table"
 				style="text-align: center;">
 				<thead>
 					<tr>
 						<th>ID</th>
 						<th>ISBN</th>
 						<th>书名</th>
+						<th>封面</th>
 						<th>作者</th>
 						<th>出版社</th>
-						<th>价格</th>
+					<!-- 	<th>价格</th> -->
 						<th>类型</th>
 						<th>状态</th>
 						<th>所在馆室</th>
@@ -101,11 +109,14 @@
 						"data" : "bName"
 					},
 					{
-						"data" : "bAuth"
+						"data" : "cover"
 					},
 					{
-						"data" : "bPublish"
+						"data" : "bAuth"
 					},
+					/* {
+						"data" : "bPublish"
+					}, */
 					{
 						"data" : "bPrice"
 					},
@@ -121,7 +132,14 @@
 				],
 	
 				"columnDefs" : [
-	
+				
+					{
+						"targets" : [ 3 ], // 目标列位置，下标从0开始
+						"data" : "cover", // 数据列名
+						"render" : function(data, type, full) { // 返回自定义内容
+							return "<img width='100px;' src='/pic/cover/"+data+"'>";
+						}
+					},
 					{
 						"targets" : [ 7 ], // 目标列位置，下标从0开始
 						"data" : "bState", // 数据列名
