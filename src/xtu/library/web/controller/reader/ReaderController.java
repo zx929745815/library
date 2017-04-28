@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-
 import xtu.library.entity.Book;
 import xtu.library.entity.BorrowMessage;
 import xtu.library.entity.Pagination;
@@ -127,26 +126,29 @@ public class ReaderController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/updateReader")
-	public Map<String, Object> updateReader(Reader r,@RequestParam(value="tmpFile",required = false) MultipartFile tmpFile, HttpSession session,HttpServletRequest request) {
+	public Map<String, Object> updateReader(Reader r,
+			@RequestParam(value = "tmpFile", required = false) MultipartFile tmpFile, HttpSession session,
+			HttpServletRequest request) {
 		String result = null;
+		// 从session中获得当前用户的信息
+	    Reader reader = (Reader) session.getAttribute("reader");
+	    String logoSrc = reader.getLogoSrc();
 		List<String> list = FileHandleUtil.getFilename(request);
-	
-		String logoSrc = null;
-		//处理图片上传的逻辑
-		if(tmpFile != null){
-			String savePath = "C:\\Users\\zx929\\Workspaces\\GraduationProject\\img\\library" ;
-			String tmpFileName = tmpFile.getOriginalFilename();//上传的文件名
+		// 处理图片上传的逻辑
+		if (tmpFile != null) {
+			String savePath = "C:\\Users\\zx929\\Workspaces\\GraduationProject\\img\\library\\logo";
+			String tmpFileName = tmpFile.getOriginalFilename();// 上传的文件名
 			int dot = tmpFileName.lastIndexOf('.');
 			String ext = "";
-			if((dot > -1)&&(dot<(tmpFileName.length()-1))){
-				ext = tmpFileName.substring(dot+1);//对后缀进行截取
+			if ((dot > -1) && (dot < (tmpFileName.length() - 1))) {
+				ext = tmpFileName.substring(dot + 1);// 对后缀进行截取
 			}
-			//其它格式的文件不进行处理
-			if("pgn".equalsIgnoreCase(ext)||"jpg".equalsIgnoreCase(ext)||"gif".equalsIgnoreCase(ext)){
-				//对文件进行重命名
+			// 其它格式的文件不进行处理
+			if ("pgn".equalsIgnoreCase(ext) || "jpg".equalsIgnoreCase(ext) || "gif".equalsIgnoreCase(ext)) {
+				// 对文件进行重命名
 				String targetFileName = StringUtil.renameFileName(tmpFileName);
-				//创建需要被保存的新文件
-				File target = new File(savePath,targetFileName);
+				// 创建需要被保存的新文件
+				File target = new File(savePath, targetFileName);
 				try {
 					FileUtils.copyInputStreamToFile(tmpFile.getInputStream(), target);
 				} catch (IOException e) {
@@ -154,10 +156,8 @@ public class ReaderController extends BaseController {
 					e.printStackTrace();
 				}
 				logoSrc = targetFileName;
-			};
+			}
 		}
-		// 从session中获得当前用户的信息并且更新
-		Reader reader = (Reader) session.getAttribute("reader");
 		// 对修改的字段进行更新
 		reader.setrName(r.getrName());
 		reader.setrSex(r.getrSex());
@@ -165,7 +165,6 @@ public class ReaderController extends BaseController {
 		reader.setrDept(r.getrDept());
 		reader.setrPref(r.getrPref());
 		reader.setLogoSrc(logoSrc);
-		session.setAttribute("reader", reader);
 		try {
 			readerService.updateReader(reader);
 			result = "success";
@@ -226,15 +225,15 @@ public class ReaderController extends BaseController {
 		}
 		return "common/error";
 	}
-	
+
 	@RequestMapping("/queryReaderByCondition")
 	public String queryReaderByCondition(String condition, String keywords, Model model) {
 		Reader reader = null;
 		String errMsg = null;
 		String operator = "search";
 		List<Reader> readerList = new ArrayList<Reader>();
-		if(condition != null && keywords != null){
-			if(condition.equals("byrno")){
+		if (condition != null && keywords != null) {
+			if (condition.equals("byrno")) {
 				Integer rno;
 				try {
 					rno = Integer.valueOf(keywords);
@@ -246,18 +245,18 @@ public class ReaderController extends BaseController {
 					model.addAttribute("errMsg", errMsg);
 					return "common/error";
 				}
-			}else if(condition.equals("byrname")){
+			} else if (condition.equals("byrname")) {
 				String rname = keywords;
 				readerList = readerService.findByName(rname);
 			}
 			model.addAttribute("operator", operator);
 			model.addAttribute("readerList", readerList);
 			return "reader/readerList";
-		}else{
+		} else {
 			errMsg = "查询条件不正确";
 			return "common/error";
 		}
-		
+
 	}
 
 	/**
@@ -285,9 +284,10 @@ public class ReaderController extends BaseController {
 		}
 		return dataMap;
 	}
-	
+
 	/**
 	 * 读者的借书动作
+	 * 
 	 * @param bId
 	 * @param ISBN
 	 * @param RNO
@@ -296,24 +296,24 @@ public class ReaderController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping("/borrowBook")
-	public Map<String, Object> borrowBook(Integer bId,Integer ISBN,Integer RNO, HttpSession session) {
+	public Map<String, Object> borrowBook(Integer bId, Integer ISBN, Integer RNO, HttpSession session) {
 		Book book = null;
 		Reader reader = null;
-		//学号不为空就是通过管理员来借出
-		if(RNO != null && ISBN != null){
+		// 学号不为空就是通过管理员来借出
+		if (RNO != null && ISBN != null) {
 			reader = readerService.findByRNo(RNO);
 			book = bookService.queryByISBN(ISBN);
-		}else{
-			if(bId != null){
+		} else {
+			if (bId != null) {
 				reader = (Reader) session.getAttribute("reader");
 				book = bookService.queryById(bId);
-			}else{
+			} else {
 				dataMap.put("msg", false);
 				return dataMap;
 			}
 		}
 		// 对书的数量和该用户的可借书数进行一个判断
-		if (book.getbCopy() > 0 && reader.getReaderCard().getMaxAvailable()>0) {
+		if (book.getbCopy() > 0 && reader.getReaderCard().getMaxAvailable() > 0) {
 			BorrowMessage borrowMessage = new BorrowMessage();
 			borrowMessage.setbId(book.getbId());
 			borrowMessage.setBookISBN(book.getbISBN());
@@ -326,15 +326,15 @@ public class ReaderController extends BaseController {
 			// 借阅的状态，1为已还，0为未还。
 			borrowMessage.setBorrowState(0);
 			ReaderCard readerCard = reader.getReaderCard();
-			//保存借阅信息
+			// 保存借阅信息
 			borrowMessage.setrCard(readerCard);
 			borMsgService.saveBorMsg(borrowMessage);
-			//对用户的可借书数量减去1;
-			readerCard.setMaxAvailable(readerCard.getMaxAvailable()-1);
+			// 对用户的可借书数量减去1;
+			readerCard.setMaxAvailable(readerCard.getMaxAvailable() - 1);
 			reader.setReaderCard(readerCard);
 			readerService.updateReader(reader);
-			//对书的库存数量减去1
- 			book.setbCopy(book.getbCopy() - 1);
+			// 对书的库存数量减去1
+			book.setbCopy(book.getbCopy() - 1);
 			bookService.updateBook(book);
 			dataMap.put("msg", true);
 			return dataMap;
@@ -342,9 +342,10 @@ public class ReaderController extends BaseController {
 		dataMap.put("msg", false);
 		return dataMap;
 	}
-	
+
 	/**
 	 * 查看借阅信息
+	 * 
 	 * @param session
 	 * @param model
 	 * @param rId
@@ -352,43 +353,46 @@ public class ReaderController extends BaseController {
 	 * @return
 	 */
 	@RequestMapping("/toCheckBorMsg")
-	public String toCheckBorMsg(HttpSession session, Model model,Integer rId,Boolean history) {
+	public String toCheckBorMsg(HttpSession session, Model model, Integer rId, Boolean history) {
 		List<BorrowMessage> borMsgList = null;
 		ReaderCard readerCard = null;
 		Reader reader = (Reader) session.getAttribute("reader");
 		if (reader != null) {
-			 rId = reader.getrId();
+			rId = reader.getrId();
 			readerCard = readerCardService.getReaderCardById(rId);
-		}else{
+		} else {
 			readerCard = readerCardService.getReaderCardById(rId);
 		}
-		
-		if(history!=null && history){
+
+		if (history != null && history) {
 			borMsgList = readerCard.getBroMsgList();
-		}else{
+		} else {
 			borMsgList = borMsgService.queryBorMsgByCid(readerCard.getcId());
 		}
 		model.addAttribute("borMsgList", borMsgList);
 		return "reader/broMsgList";
-	
 
 	}
+
 	/**
 	 * 查看逾期的图书
+	 * 
 	 * @param session
 	 * @param model
 	 * @return
 	 */
 	@RequestMapping("/queryOverduBorMsg")
-	public String queryOverduBorMsg(HttpSession session,Model model){
+	public String queryOverduBorMsg(HttpSession session, Model model) {
 		Reader reader = (Reader) session.getAttribute("reader");
 		List<BorrowMessage> borMsgList = borMsgService.queryOverduBorMsgByCid(reader.getReaderCard().getcId());
-		model.addAttribute("borMsgList",borMsgList);
+		model.addAttribute("borMsgList", borMsgList);
 		return "reader/readerOverduBorMsg";
-		
+
 	}
+
 	/**
 	 * 通过id来删除一个读者
+	 * 
 	 * @param rId
 	 * @param model
 	 * @return
