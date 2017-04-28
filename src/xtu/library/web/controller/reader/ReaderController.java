@@ -1,22 +1,28 @@
 package xtu.library.web.controller.reader;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+
 
 import xtu.library.entity.Book;
 import xtu.library.entity.BorrowMessage;
-import xtu.library.entity.Notice;
 import xtu.library.entity.Pagination;
 import xtu.library.entity.Reader;
 import xtu.library.entity.ReaderCard;
@@ -27,6 +33,8 @@ import xtu.library.service.notice.INoticeService;
 import xtu.library.service.reader.IReaderService;
 import xtu.library.service.readercard.IReaderCardService;
 import xtu.library.web.controller.BaseController;
+import xtu.library.web.util.FileHandleUtil;
+import xtu.library.web.util.StringUtil;
 
 @Controller
 @RequestMapping("/reader")
@@ -42,8 +50,6 @@ public class ReaderController extends BaseController {
 	private IBorrowMsgService borMsgService;
 	@Autowired
 	private IReaderCardService readerCardService;
-	@Autowired
-	private INoticeService noticeService;
 
 	/**
 	 * 管理员首页的注意事项界面
@@ -121,9 +127,35 @@ public class ReaderController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/updateReader")
-	public Map<String, Object> updateReader(Reader r, HttpSession session) {
+	public Map<String, Object> updateReader(Reader r,@RequestParam(value="tmpFile",required = false) MultipartFile tmpFile, HttpSession session,HttpServletRequest request) {
 		String result = null;
-		Map<String, Object> resultMap = new HashMap<String, Object>();
+		List<String> list = FileHandleUtil.getFilename(request);
+	
+		String logoSrc = null;
+		//处理图片上传的逻辑
+		if(tmpFile != null){
+			String savePath = "C:\\Users\\zx929\\Workspaces\\GraduationProject\\img\\library" ;
+			String tmpFileName = tmpFile.getOriginalFilename();//上传的文件名
+			int dot = tmpFileName.lastIndexOf('.');
+			String ext = "";
+			if((dot > -1)&&(dot<(tmpFileName.length()-1))){
+				ext = tmpFileName.substring(dot+1);//对后缀进行截取
+			}
+			//其它格式的文件不进行处理
+			if("pgn".equalsIgnoreCase(ext)||"jpg".equalsIgnoreCase(ext)||"gif".equalsIgnoreCase(ext)){
+				//对文件进行重命名
+				String targetFileName = StringUtil.renameFileName(tmpFileName);
+				//创建需要被保存的新文件
+				File target = new File(savePath,targetFileName);
+				try {
+					FileUtils.copyInputStreamToFile(tmpFile.getInputStream(), target);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				logoSrc = targetFileName;
+			};
+		}
 		// 从session中获得当前用户的信息并且更新
 		Reader reader = (Reader) session.getAttribute("reader");
 		// 对修改的字段进行更新
@@ -132,15 +164,17 @@ public class ReaderController extends BaseController {
 		reader.setrGrade(r.getrGrade());
 		reader.setrDept(r.getrDept());
 		reader.setrPref(r.getrPref());
+		reader.setLogoSrc(logoSrc);
+		session.setAttribute("reader", reader);
 		try {
 			readerService.updateReader(reader);
 			result = "success";
 		} catch (Exception e) {
 			e.printStackTrace();
-			result = "false";
+			result = "fail";
 		}
-		resultMap.put("msg", result);
-		return resultMap;
+		dataMap.put("msg", result);
+		return dataMap;
 	}
 
 	@ResponseBody
@@ -237,7 +271,6 @@ public class ReaderController extends BaseController {
 	@ResponseBody
 	@RequestMapping("/updatePassWord")
 	public Map<String, Object> updatePassWord(String mpass, String newpass, HttpSession session) {
-		String msg = null;
 		if (mpass != null && newpass != null) {
 			Reader reader = (Reader) session.getAttribute("reader");
 			if (mpass.equals(reader.getrPwd())) {
