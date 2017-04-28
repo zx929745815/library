@@ -47,6 +47,7 @@ public class LoginController {
 		// 判断是普通用户还是管理员登陆,0是普通用户，1是管理员
 		if (role != null && loginname != null && password != null) {// 对role进行非空检测
 			password = MD5Util.MD5Encrypt(password);
+			System.out.println(password);
 			if (role == 0) {
 				List<Reader> readerList = readerService.findByName(loginname);
 				if (readerList != null) {
