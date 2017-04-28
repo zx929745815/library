@@ -1,10 +1,4 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
-<%
-	String path = request.getContextPath();
-	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
-			+ path + "/";
-%>
-
 <!DOCTYPE html>
 <html lang="zh-cn">
 <head>
@@ -18,6 +12,7 @@
 <link rel="stylesheet" href="${path}/library/static/css/admin.css">
 <script src="${path}/library/static/js/jquery.js"></script>
 <script src="${path}/library/static/js/pintuer.js"></script>
+<script src="${path}/library/static/js/jquery.form.js"></script>
 
 </head>
 <body>
@@ -26,7 +21,7 @@
 			<strong><span class="icon-pencil-square-o"></span>添加书籍</strong>
 		</div>
 		<div class="body-content">
-			<form method="post" class="form-x" action="" id="bookInfo">
+			<form method="post" class="form-x" action="" id="bookInfo" enctype="multipart/form-data">
 				<div class="form-group">
 					<div class="label">
 						<label>图书编号：</label>
@@ -38,7 +33,7 @@
 					</div>
 				</div>
 
-				<!--    <div class="form-group">
+			  <div class="form-group">
         <div class="label">
           <label>图书图片：</label>
         </div>
@@ -47,7 +42,7 @@
           <input type="button" class="button bg-blue margin-left" id="image1" value="+ 浏览上传"  style="float:left;">
           <div class="tipss">图片尺寸：500*500</div>
         </div>
-      </div>   -->
+      </div>  
 
 				<div class="form-group">
 					<div class="label">
@@ -79,6 +74,15 @@
 						<input type="text" class="input w50" value="" name="bAuth"
 							data-validate="required:请输入图书作者" />
 						<div class="tips"></div>
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<div class="label">
+						<label for="sitename">封面:</label>
+					</div>
+					<div class="field">
+						<input type="file" name="tmpFile" />
 					</div>
 				</div>
 
@@ -191,26 +195,19 @@
 
 	<script type="text/javascript">
 	$("#addBook").click(function(){
-	var bookInfo = $('#bookInfo').serialize();
-      $.ajax({
-        url : "${path }/library/book/addBook.do",
-        type : "post",
-        data : bookInfo,
-        dataType : "json",
-        success : function(result) {
-          if (result.msg) {
-            alert("添加书籍信息成功！");
-            location.href = "${path}/library/admin/toAddBook.do";
-          } else {
-            alert("添加书籍信息失败！");
-          }
-        },
-        error : function() {
-          alert("添加过程中出现了系统错误！");
-        }
-      });
+
+	$('#bookInfo').ajaxSubmit({
+		type:"post",
+		url:"${path }/library/book/addBook.do",
+		success: function(data) {  
+                if(data.msg ){  
+                    alert("添加书籍成功！");
+                }else{
+                alert("添加书籍失败!");
+               } 
+              }  
 	});
-	
+	});
 	
 	</script>
 
