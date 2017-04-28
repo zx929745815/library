@@ -16,7 +16,8 @@
 <title></title>
 <link rel="stylesheet" href="${path}/library/static/css/pintuer.css">
 <link rel="stylesheet" href="${path}/library/static/css/admin.css">
-<script src="${path}/library/static/js/jquery.js"></script>
+<script src="${path}/library/static/js/jquery-3.1.1.js"></script>
+<script src="${path}/library/static/js/jquery.form.js"></script>
 <script src="${path}/library/static/js/pintuer.js"></script>
 </head>
 <body>
@@ -27,7 +28,7 @@
 		<div class="body-content">
 
 
-			<form id="readerinfo"  class="form-x" action="">
+			<form role="form" id="readerinfo" name="readerinfo" enctype="multipart/form-data" class="form-x" action="" method="post">
 				<div class="form-group">
 					<div class="label">
 						<label for="sitename">学号：</label>
@@ -48,10 +49,10 @@
 				
 				<div class="form-group">
 					<div class="label">
-						<label for="sitename">头像</label>
+						<label for="sitename">头像:</label>
 					</div>
 					<div class="field">
-						<input type="file" name="logoSrc" />
+						<input type="file" name="tmpFile" />
 					</div>
 				</div>
 				
@@ -103,8 +104,7 @@
 						<label></label>
 					</div>
 					<div class="field">
-						<button id="update" class="button bg-main icon-check-square-o" type="button">
-							提交</button>
+						<input id="update" class="button bg-main icon-check-square-o" type="submit" value="提交" >
 					</div>
 				</div>
 			</form>
@@ -113,12 +113,30 @@
 
       <script type="text/javascript">	
 	$('#update').click(function(){
-    var r = $('#readerinfo').serialize();
-	$.ajax({
+	
+	$('#readerinfo').ajaxSubmit({
+		type:'post',
+		url:'updateReader.do',
+		
+		success: function(data) {  
+                if(data.success){  
+                    alert("hahaha");
+                }  
+              }  
+	});
+	
+	
+	
+	
+	
+    /* var r = $('#readerinfo').serialize(); */
+    /* var formDate = new FormData($("#readerinfo")[0]); */
+	/* $.ajax({
 		url: "updateReader.do",
         type: "post",
-		data:r, 
+		data:formDate, 
 		dataType: "json",
+        processData: false, 
 		success:function(result) {
 		
 		if(result.msg == 'success'){
@@ -130,7 +148,7 @@
 		error: function(){
 			alert("在修改过程中发生了系统错误！");
 		}
-	});
+	}); */
 	});
 	</script>
 
