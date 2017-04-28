@@ -1,9 +1,5 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
-<%
-	String path = request.getContextPath();
-	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
-			+ path + "/";
-%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <!DOCTYPE html>
 <html lang="zh-cn">
@@ -47,11 +43,16 @@
 					</div>
 				</div>
 				
+				
+				
 				<div class="form-group">
 					<div class="label">
 						<label for="sitename">头像:</label>
 					</div>
 					<div class="field">
+					<c:if test="${not empty reader.logoSrc}">
+						<img width="100px;" alt="头像" src="/pic/${reader.logoSrc }"><br>
+					</c:if>
 						<input type="file" name="tmpFile" />
 					</div>
 				</div>
@@ -119,9 +120,11 @@
 		url:'updateReader.do',
 		
 		success: function(data) {  
-                if(data.success){  
-                    alert("hahaha");
-                }  
+                if(data.msg == 'success'){  
+                    alert("修改成功！");
+                }else{
+                alert("修改失败!");
+               } 
               }  
 	});
 	
