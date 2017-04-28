@@ -27,6 +27,7 @@ public class Book implements Serializable{
 	@Column(unique = true)
 	private Integer bISBN;
 	private String bName;
+	private String cover;
 	private Double bPrice;
 	private String bAuth;
 	private String bPublish;
@@ -149,6 +150,12 @@ public class Book implements Serializable{
 		this.bISBN = bISBN;
 		this.bName = bName;
 		this.bPublish = bPublish;
+	}
+	public String getCover() {
+		return cover;
+	}
+	public void setCover(String cover) {
+		this.cover = cover;
 	}
 	
 	
