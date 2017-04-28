@@ -1,4 +1,5 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
@@ -22,9 +23,15 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
     <h1>湘潭大学图书馆个人管理中心</h1>
   </div>
   <div class="head-l"><a class="button button-little bg-green" href="" target="_blank"><span class="icon-home"></span> 前台首页</a> &nbsp;&nbsp;<a href="##" class="button button-little bg-blue"><span class="icon-wrench"></span> 清除缓存</a> &nbsp;&nbsp;<a class="button button-little bg-red" href="${path }/library/login/logOut.do"><span class="icon-power-off"></span> 退出登录</a> </div>
-  
-  <div id="welcome"><img src="${path}/library/static/images/y.jpg" class="radius-circle rotate-hover" height="50" alt="用户头像" />
-  <span ><strong >${reader.rName},欢迎登陆！</Strong></span></div>
+   
+   <div id="welcome">
+   <c:if test="${not empty reader.logoSrc}">
+   <img src="/pic/${reader.logoSrc }" class="radius-circle rotate-hover" height="50" alt="用户头像" />
+   </c:if>
+   <c:if test="${empty reader.logoSrc}">
+   <img src="${path}/library/static/images/y.jpg" class="radius-circle rotate-hover" height="50" alt="用户头像" />
+   </c:if><strong >${reader.rName},欢迎登陆！</Strong></div>
+
 </div>
 
 
@@ -55,7 +62,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
     <ul>
     <li><a href="${path }/library/notice/queryNoticeHistory.do?pageIndex=1" target="right"><span class="icon-caret-right"></span>系统公告</a></li>
     </ul>   
-
 </div>
 <script type="text/javascript">
 $(function(){
