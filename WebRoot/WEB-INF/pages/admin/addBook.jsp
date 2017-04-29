@@ -10,9 +10,11 @@
 <title></title>
 <link rel="stylesheet" href="${path}/library/static/css/pintuer.css">
 <link rel="stylesheet" href="${path}/library/static/css/admin.css">
+<link rel="stylesheet" href="${path}/library/static/css/sweetalert.css">
 <script src="${path}/library/static/js/jquery.js"></script>
 <script src="${path}/library/static/js/pintuer.js"></script>
 <script src="${path}/library/static/js/jquery.form.js"></script>
+<script src="${path}/library/static/js/sweetalert.min.js"></script>
 
 </head>
 <body>
@@ -195,13 +197,12 @@
 
 	<script type="text/javascript">
 	$("#addBook").click(function(){
-
 	$('#bookInfo').ajaxSubmit({
 		type:"post",
 		url:"${path }/library/book/addBook.do",
 		success: function(data) {  
-                if(data.msg ){  
-                    alert("添加书籍成功！");
+                if(data.msg){  
+                    swal("添加书籍成功!", "success")
                 }else{
                 alert("添加书籍失败!");
                } 

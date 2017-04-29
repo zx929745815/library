@@ -17,11 +17,10 @@
 <title></title>
 <link rel="stylesheet" href="${path}/library/static/css/pintuer.css">
 <link rel="stylesheet" href="${path}/library/static/css/admin.css">
+<link rel="stylesheet" href="${path}/library/static/css/sweetalert.css">
 <script src="${path}/library/static/js/jquery-3.1.1.js"></script>
 <script src="${path}/library/static/js/pintuer.js"></script>
-
-
-
+<script src="${path}/library/static/js/sweetalert.min.js"></script>
 </head>
 <body>
 	<div class="panel admin-panel">
@@ -34,7 +33,7 @@
 			<form id="readerinfo" class="form-x" action="">
 				<div class="form-group">
 					<div class="label">
-						<label for="sitename">学号:</label>
+						<label for="sitename">学&nbsp;&nbsp;号:</label>
 					</div>
 					<div class="field">
 						<label style="line-height:33px;"> ${reader.rNo} </label>
@@ -100,21 +99,25 @@
 						<label></label>
 					</div>
 					<div class="field">
-						<button id="back" class="button bg-main "
-							type="button">返回</button>
+						<button id="back" class="button bg-main " type="button">返回</button>
 					</div>
 				</div>
 			</form>
 		</div>
 	</div>
-
-
-
 	<script type="text/javascript">
+	$(document).ready(function(){
+	if(${empty reader.rSex}){
+		swal({
+         title: "您的个人信息还不完整!",
+         text: "<a href='/library/reader/updateReaderInfo.do'><span style='color:#F8BB86'>点击此处完善个人信息</span></a>",
+          html: true
+         });
+	}
+	});
 		$('#back').click(function() {
 			window.history.back();
 		});
 	</script>
-
 </body>
 </html>

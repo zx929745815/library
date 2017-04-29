@@ -12,12 +12,6 @@
 
 <title>My JSP 'success.jsp' starting page</title>
 
-<meta http-equiv="pragma" content="no-cache">
-<meta http-equiv="cache-control" content="no-cache">
-<meta http-equiv="expires" content="0">
-<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
-<meta http-equiv="description" content="This is my page">
-
 <!--自动跳转  -->
 <script type="text/javascript">
 	function countDown(secs, surl) {
@@ -38,12 +32,14 @@
     height: 100%;
     text-align: center;
     font-size: 30px;
+    margin-top: 160px;
+    color: white;
 }
 </style>
 
 </head>
 
-<body background="${path }/library/static/images/xtulibrary.jpg">
+<body background="${path }/library/static/images/bg.jpg">
     <div id="content">
            注册成功！<br>
 	<span id="jumpTo">5</span>秒后自动跳转到登陆界面！

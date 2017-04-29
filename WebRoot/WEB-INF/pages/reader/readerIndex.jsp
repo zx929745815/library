@@ -26,7 +26,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
    
    <div id="welcome">
    <c:if test="${not empty reader.logoSrc}">
-   <img src="/pic/${reader.logoSrc }" class="radius-circle rotate-hover" height="50" alt="用户头像" />
+   <img src="/pic/logo/${reader.logoSrc }" class="radius-circle rotate-hover" height="50" alt="用户头像" />
    </c:if>
    <c:if test="${empty reader.logoSrc}">
    <img src="${path}/library/static/images/y.jpg" class="radius-circle rotate-hover" height="50" alt="用户头像" />

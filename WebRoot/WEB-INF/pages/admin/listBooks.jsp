@@ -114,12 +114,12 @@
 					{
 						"data" : "bAuth"
 					},
-					/* {
+					 {
 						"data" : "bPublish"
-					}, */
-					{
+					}, 
+					/* {
 						"data" : "bPrice"
-					},
+					}, */
 					{
 						"data" : "bType"
 					},
